@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSC CHSL Study Planner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --secondary: #a855f7;
+            --accent: #f97316;
+            --success: #10b981;
+            --dark-bg: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: white;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background Blobs */
+        .bg-blob-1 {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            filter: blur(80px);
+            top: 10%;
+            left: 5%;
+            animation: float 15s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        .bg-blob-2 {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            background: rgba(168, 85, 247, 0.3);
+            border-radius: 50%;
+            filter: blur(80px);
+            top: 30%;
+            right: 5%;
+            animation: float 20s ease-in-out infinite;
+            animation-delay: 2s;
+            z-index: 0;
+        }
+
+        .bg-blob-3 {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            background: rgba(249, 115, 22, 0.2);
+            border-radius: 50%;
+            filter: blur(80px);
+            bottom: 10%;
+            left: 10%;
+            animation: float 18s ease-in-out infinite;
+            animation-delay: 4s;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-30px) translateX(20px); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #fb923c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 1.2rem;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-title {
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 10px 0;
+            background: linear-gradient(135deg, #60a5fa 0%, #fb923c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-subtitle {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f97316 0%, #fb923c 100%);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Alert Box */
+        .alert-box {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(239, 68, 68, 0.2) 100%);
+            border: 1px solid rgba(249, 115, 22, 0.5);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 40px;
+            display: flex;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .alert-icon {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+
+        .alert-content h3 {
+            color: #fed7aa;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        .alert-content ul {
+            list-style: none;
+            space-y: 8px;
+        }
+
+        .alert-content li {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        /* Day Cards */
+        .days-container {
+            space-y: 24px;
+            margin-bottom: 40px;
+        }
+
+        .day-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.8s ease;
+            animation-fill-mode: both;
+        }
+
+        .day-card:nth-child(1) { animation-delay: 0.1s; }
+        .day-card:nth-child(2) { animation-delay: 0.2s; }
+        .day-card:nth-child(3) { animation-delay: 0.3s; }
+        .day-card:nth-child(4) { animation-delay: 0.4s; }
+        .day-card:nth-child(5) { animation-delay: 0.5s; }
+        .day-card:nth-child(6) { animation-delay: 0.6s; }
+        .day-card:nth-child(7) { animation-delay: 0.7s; }
+
+        .day-header {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.5) 0%, rgba(168, 85, 247, 0.5) 100%);
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .day-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .day-header p {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .day-tasks {
+            padding: 20px;
+            space-y: 16px;
+        }
+
+        .task {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .task:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateX(5px);
+        }
+
+        .task.completed {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+
+        .task-checkbox {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #64748b;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .task.completed .task-checkbox {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 1.05rem;
+        }
+
+        .task.completed .task-title {
+            color: #86efac;
+            text-decoration: line-through;
+        }
+
+        .task-time {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .task-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .task-detail {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .task-description {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .task-emoji {
+            font-size: 1.5rem;
+            margin-right: 8px;
+        }
+
+        /* Subject Breakdown */
+        .subjects-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .subject-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .subject-card:nth-child(1) {
+            border-top-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .subject-card:nth-child(2) {
+            border-top-color: rgba(168, 85, 247, 0.5);
+        }
+
+        .subject-card:nth-child(3) {
+            border-top-color: rgba(34, 197, 94, 0.5);
+        }
+
+        .subject-card:nth-child(4) {
+            border-top-color: rgba(249, 115, 22, 0.5);
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .subject-name {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .subject-stat {
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        .subject-stat strong {
+            font-size: 1.3rem;
+            color: #60a5fa;
+        }
+
+        /* Tips Section */
+        .tips-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .tip-card {
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+        }
+
+        .tip-card:nth-child(2) {
+            border-left-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .tip-card:nth-child(3) {
+            border-left-color: #a855f7;
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .tip-card:nth-child(4) {
+            border-left-color: #f97316;
+            background: rgba(249, 115, 22, 0.1);
+        }
+
+        .tip-title {
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        .tip-card ul {
+            list-style: none;
+        }
+
+        .tip-card li {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p {
+            margin-bottom: 8px;
+            font-size: 1.05rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .task {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-blob-1"></div>
+    <div class="bg-blob-2"></div>
+    <div class="bg-blob-3"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>SSC CHSL Master Plan</h1>
+            <p>Transform consistency into scores 🚀</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">📊 This Week's Progress</div>
+                    <div class="stat-icon">🏆</div>
+                </div>
+                <div class="stat-value" id="progressValue">0%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                </div>
+                <div class="stat-subtitle" id="progressText">0/14 sessions done</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">⚡ Videos Pending</div>
+                    <div class="stat-icon">🎥</div>
+                </div>
+                <div class="stat-value">205</div>
+                <div class="stat-subtitle">~154 hours of content</div>
+                <div class="stat-subtitle">At this pace: 12 weeks to complete</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">⏰ Study Time/Week</div>
+                    <div class="stat-icon">📚</div>
+                </div>
+                <div class="stat-value">10.5</div>
+                <div class="stat-subtitle">hours per week</div>
+                <div class="stat-subtitle">3.5 AM + 7 PM sessions</div>
+            </div>
+        </div>
+
+        <!-- Alert Box -->
+        <div class="alert-box">
+            <div class="alert-icon">🔥</div>
+            <div class="alert-content">
+                <h3>Why This Plan Works For You</h3>
+                <ul>
+                    <li>✅ <strong>Alternating Subjects:</strong> No burnout - different subjects keep your mind fresh</li>
+                    <li>✅ <strong>Practice After Theory:</strong> Watch video → practice immediately = concepts stick</li>
+                    <li>✅ <strong>Mixed Difficulty:</strong> Saturday includes full mock (harder) to simulate real exam</li>
+                    <li>✅ <strong>Sunday Analysis:</strong> Review mistakes ONLY if you scored <70% (not wasting time)</li>
+                    <li>✅ <strong>Realistic Timeline:</strong> 12 weeks of solid prep = better scores than random studying</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Weekly Schedule -->
+        <div class="days-container" id="daysContainer"></div>
+
+        <!-- Subject Breakdown -->
+        <div class="subjects-section">
+            <h2 class="section-title">📊 Video Distribution & Timeline</h2>
+            <div class="subjects-grid">
+                <div class="subject-card">
+                    <div class="subject-name">📘 Aptitude</div>
+                    <div class="subject-stat"><strong>42</strong> videos</div>
+                    <div class="subject-stat">~52.5 hours</div>
+                    <div class="subject-stat">Avg: 75 min/video</div>
+                </div>
+                <div class="subject-card">
+                    <div class="subject-name">📗 English</div>
+                    <div class="subject-stat"><strong>31</strong> videos</div>
+                    <div class="subject-stat">~38.75 hours</div>
+                    <div class="subject-stat">Avg: 75 min/video</div>
+                </div>
+                <div class="subject-card">
+                    <div class="subject-name">📙 Current Affairs</div>
+                    <div class="subject-stat"><strong>10</strong> videos</div>
+                    <div class="subject-stat">~12.5 hours</div>
+                    <div class="subject-stat">Avg: 75 min/video</div>
+                </div>
+                <div class="subject-card">
+                    <div class="subject-name">📕 General Studies</div>
+                    <div class="subject-stat"><strong>122</strong> videos</div>
+                    <div class="subject-stat">~152.5 hours</div>
+                    <div class="subject-stat">Avg: 75 min/video</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="tips-section">
+            <h2 class="section-title">💪 Motivation & Consistency Tips</h2>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-title">⏰ Time Management</div>
+                    <ul>
+                        <li>• Set phone alarms 10 min before each session</li>
+                        <li>• Prepare study area night before (desk setup)</li>
+                        <li>• Start with a 2-min warm-up (read notes/review)</li>
+                        <li>• College ends when you close books - no half-study</li>
+                    </ul>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-title">🎯 Consistency Hacks</div>
+                    <ul>
+                        <li>• Mark ✅ today - feel the instant win</li>
+                        <li>• Don't skip a day - 2 skips = motivation death</li>
+                        <li>• If missed AM, do 2-hour evening session</li>
+                        <li>• Celebrate weekly: weekend cheat meal after 7/7 days</li>
+                    </ul>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-title">🧠 Learning Hack</div>
+                    <ul>
+                        <li>• Watch video on 1.25x speed (saves 10% time)</li>
+                        <li>• Pause & write 3 key points after each video</li>
+                        <li>• Practice questions = active recall (most important)</li>
+                        <li>• One mistake = revisit that concept ONLY</li>
+                    </ul>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-title">⚡ Staying Energized</div>
+                    <ul>
+                        <li>• 5 AM: Drink water, light breakfast (banana/milk)</li>
+                        <li>• Mid-session (7 PM): 2-min walk break</li>
+                        <li>• No phone during study (WhatsApp = dopamine trap)</li>
+                        <li>• Track progress - seeing 70%+ gives energy!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>🚀 Consistency beats perfection. One day at a time. You've got this!</p>
+            <p>Last updated: <span id="currentDate"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const schedule = {
+            Monday: {
+                "5:00-6:30 AM": { type: "video", subject: "Aptitude", duration: "60–90 min", videoCount: "1 video only", description: "1 video fits the slot (60–90 min per video)", emoji: "🎥" },
+                "7:30-9:00 PM": { type: "practice", subject: "Reasoning", duration: "90 min", description: "Practice last 5 questions from each topic", emoji: "✏️" }
+            },
+            Tuesday: {
+                "5:00-6:30 AM": { type: "video", subject: "English", duration: "60–90 min", videoCount: "1 video only", description: "1 video fits the slot (60–90 min per video)", emoji: "🎥" },
+                "7:30-9:00 PM": { type: "practice", subject: "Aptitude", duration: "90 min", description: "Previous day's concepts + 10 new questions", emoji: "✏️" }
+            },
+            Wednesday: {
+                "5:00-6:30 AM": { type: "video", subject: "General Studies", duration: "60–90 min", videoCount: "1 video only", description: "1 video fits the slot (60–90 min per video)", emoji: "🎥" },
+                "7:30-9:00 PM": { type: "practice", subject: "English", duration: "90 min", description: "Error detection & reading comprehension", emoji: "✏️" }
+            },
+            Thursday: {
+                "5:00-6:30 AM": { type: "video", subject: "Aptitude", duration: "60–90 min", videoCount: "1 video only", description: "1 video fits the slot (60–90 min per video)", emoji: "🎥" },
+                "7:30-9:00 PM": { type: "practice", subject: "General Studies", duration: "90 min", description: "Practice MCQs from previous topics", emoji: "✏️" }
+            },
+            Friday: {
+                "5:00-6:30 AM": { type: "video", subject: "Current Affairs", duration: "60–90 min", videoCount: "1 video only", description: "1 video fits the slot (60–90 min per video)", emoji: "🎥" },
+                "7:30-9:00 PM": { type: "practice", subject: "Mixed (All)", duration: "90 min", description: "Mini test: 10Q each subject", emoji: "✏️" }
+            },
+            Saturday: {
+                "5:00-7:00 AM": { type: "video", subject: "General Studies", duration: "60–90 min (120 min slot)", videoCount: "1 video + short notes", description: "Watch 1 video (up to 90 min), use leftover time for quick notes", emoji: "🎥" },
+                "7:30-9:00 PM": { type: "practice", subject: "Full Mock Test", duration: "90 min", description: "Complete 1 full section mock (60Q)", emoji: "✏️" }
+            },
+            Sunday: {
+                "5:00-6:30 AM": { type: "revision", subject: "Weak Areas", duration: "90 min", description: "Revisit topics where you scored <70%", emoji: "🔄" },
+                "7:30-8:30 PM": { type: "planning", subject: "Weekly Review & Plan", duration: "60 min", description: "Analyze mistakes, plan next week", emoji: "📋" }
+            }
+        };
+
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const daysContainer = document.getElementById('daysContainer');
+
+        function renderSchedule() {
+            daysContainer.innerHTML = '';
+            days.forEach(day => {
+                const dayCard = document.createElement('div');
+                dayCard.className = 'day-card';
+
+                const dayTasks = schedule[day];
+                const taskCount = Object.keys(dayTasks).length;
+
+                let tasksHTML = '';
+                Object.entries(dayTasks).forEach(([time, task]) => {
+                    const taskKey = `task-${day}-${time}`;
+                    const isCompleted = localStorage.getItem(taskKey) === 'true';
+
+                    tasksHTML += `
+                        <div class="task ${isCompleted ? 'completed' : ''}" onclick="toggleTask('${day}', '${time}')">
+                            <div class="task-checkbox">${isCompleted ? '✓' : ''}</div>
+                            <div class="task-content">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span class="task-emoji">${task.emoji}</span>
+                                    <div>
+                                        <div class="task-title">${task.subject}</div>
+                                        <div class="task-time">⏱️ ${time}</div>
+                                    </div>
+                                </div>
+                                <div class="task-details">
+                                    <div class="task-detail">📌 ${task.duration}</div>
+                                    ${task.videoCount ? `<div class="task-detail">📹 ${task.videoCount}</div>` : ''}
+                                </div>
+                                <div class="task-description">💡 ${task.description}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                dayCard.innerHTML = `
+                    <div class="day-header">
+                        <h2>${day}</h2>
+                        <p>${taskCount} sessions</p>
+                    </div>
+                    <div class="day-tasks">
+                        ${tasksHTML}
+                    </div>
+                `;
+
+                daysContainer.appendChild(dayCard);
+            });
+        }
+
+        function toggleTask(day, time) {
+            const taskKey = `task-${day}-${time}`;
+            const currentValue = localStorage.getItem(taskKey) === 'true';
+            localStorage.setItem(taskKey, !currentValue);
+            renderSchedule();
+            updateProgress();
+        }
+
+        function updateProgress() {
+            let completedCount = 0;
+            let totalCount = 0;
+
+            days.forEach(day => {
+                Object.keys(schedule[day]).forEach(time => {
+                    totalCount++;
+                    const taskKey = `task-${day}-${time}`;
+                    if (localStorage.getItem(taskKey) === 'true') {
+                        completedCount++;
+                    }
+                });
+            });
+
+            const percentage = Math.round((completedCount / totalCount) * 100);
+            document.getElementById('progressValue').textContent = percentage + '%';
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = `${completedCount}/${totalCount} sessions done`;
+        }
+
+        function setCurrentDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date().toLocaleDateString('en-US', options);
+            document.getElementById('currentDate').textContent = today;
+        }
+
+        // Initialize
+        renderSchedule();
+        updateProgress();
+        setCurrentDate();
+    </script>
+</body>
+</html>
